@@ -13,15 +13,18 @@ const client = new Paho.Client(
 export default function App() {
   const [value, setValue] = useState(0);
   const [messageFromWemos, setMessageFromWemos] = useState('');
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     function onConnect() {
       console.log("Connected!");
+      setIsConnected(true);
       client.subscribe("outTopic");
     }
 
     function onFailure() {
       console.log("Failed to connect!");
+      setIsConnected(false);
     }
 
     function onMessageReceived(message) {
@@ -47,6 +50,11 @@ export default function App() {
   }, []);
 
   function changeValue() {
+    if (!isConnected) {
+      console.log("Client is not connected.");
+      return;
+    }
+
     setValue(1);
     let message = new Paho.Message("1");
     message.destinationName = "inTopic";
@@ -63,10 +71,16 @@ export default function App() {
   }
 
   function resetWemos() {
+    if (!isConnected) {
+      console.log("Client is not connected.");
+      return;
+    }
+
     // Send a message to inTopic with the value of 1 to reset the Wemos D1 Mini
     var resetMessage = new Paho.Message("1");
     resetMessage.destinationName = "inTopic";
     client.send(resetMessage);
+    console.log("Reset message sent:", resetMessage.payloadString);
   }
 
   return (
@@ -79,7 +93,12 @@ export default function App() {
           )}
           <Button
             onPress={changeValue}
-            title="Reset"
+            title="Change Value"
+            color="blue"
+          />
+          <Button
+            onPress={resetWemos}
+            title="Reset Wemos"
             color="red"
           />
         </View>
@@ -117,10 +136,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "red",
     marginTop: 10,
-  },
-  reset: {
-    fontSize: 30,
-    backgroundColor: "green",
-    color: "red", // Change this color to the desired color
   },
 });
