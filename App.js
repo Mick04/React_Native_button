@@ -43,6 +43,7 @@ export default function App() {
 
     client.onMessageArrived = onMessageReceived;
 
+    // Cleanup function
     return () => {
       client.disconnect();
     };
@@ -75,6 +76,7 @@ export default function App() {
       return;
     }
 
+    // Send a message to inTopic with the value of 1 to reset the Wemos D1 Mini
     var resetMessage = new Paho.Message("1");
     resetMessage.destinationName = "inTopic";
     client.send(resetMessage);
