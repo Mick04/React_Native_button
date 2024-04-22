@@ -12,7 +12,7 @@ const client = new Paho.Client(
 
 export default function App() {
   const [value, setValue] = useState(0);
-  const [messageFromWemos, setMessageFromWemos] = useState('');
+  const [messageFromWemos, setMessageFromWemos] = useState("");
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
@@ -31,7 +31,10 @@ export default function App() {
       console.log("Message received:", message.payloadString);
       if (message.destinationName === "inTopic") {
         setValue(parseInt(message.payloadString));
-      } else if (message.destinationName === "outTopic" && parseInt(message.payloadString) === 3) {
+      } else if (
+        message.destinationName === "outTopic" &&
+        parseInt(message.payloadString) === 3
+      ) {
         setMessageFromWemos("Switch has been open for more than 10 minutes!");
       }
     }
@@ -70,19 +73,6 @@ export default function App() {
     }, 5000);
   }
 
-  function resetWemos() {
-    if (!isConnected) {
-      console.log("Client is not connected.");
-      return;
-    }
-
-    // Send a message to inTopic with the value of 1 to reset the Wemos D1 Mini
-    var resetMessage = new Paho.Message("1");
-    resetMessage.destinationName = "inTopic";
-    client.send(resetMessage);
-    console.log("Reset message sent:", resetMessage.payloadString);
-  }
-
   return (
     <View style={styles.container}>
       <ImageBackground source={backgroundImage} style={styles.image}>
@@ -91,16 +81,7 @@ export default function App() {
           {messageFromWemos && (
             <Text style={styles.messageFromWemos}>{messageFromWemos}</Text>
           )}
-          <Button
-            onPress={changeValue}
-            title="Change Value"
-            color="blue"
-          />
-          <Button
-            onPress={resetWemos}
-            title="Reset Wemos"
-            color="red"
-          />
+          <Button onPress={changeValue} title="Change Value" color="blue" />
         </View>
         <StatusBar style="auto" />
       </ImageBackground>
